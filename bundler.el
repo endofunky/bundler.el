@@ -1,17 +1,17 @@
-;; bundler.el --- Interact with Bundler from Emacs
-;;
-;; Copyright (c) 2011 Tobias Svensson <tob@tobiassvensson.co.uk>
-;;
-;; Released under the same license as GNU Emacs.
+;;; bundler.el --- Interact with Bundler from Emacs
 
+;; Copyright (c) 2011 Tobias Svensson <tob@tobiassvensson.co.uk>
+
+;; Author: Tobias Svensson <tob@tobiassvensson.co.uk>
+;; URL: http://github.com/tobiassvn/
 ;; Keywords: bundler ruby
 ;; Created: 31 Dec 2011
-;; Author: Tobias Svensson <tob@tobiassvensson.co.uk>
 ;; Version: 1
+;; Package-Requires: ((inf-ruby "2.1"))
 
 ;; This file is NOT part of GNU Emacs.
 
-;; Commentary:
+;;; Commentary:
 
 ;; Interact with Bundler from Emacs.
 ;;
@@ -31,8 +31,8 @@
 ;;    *Bundler* as the target buffer. This exists so the output won't mess
 ;;    with the default buffer used by M-& and async-shell-command.
 
-;; Installation:
-;;
+;;; Install
+
 ;; $ cd ~/.emacs.d/vendor
 ;; $ git clone git://github.com/tobiassvn/bundler.el.git
 ;;
@@ -41,12 +41,28 @@
 ;; (add-to-list 'load-path "~/.emacs.d/vendor/bundler.el")
 ;; (require 'bundler)
 
-;; Depends on inf-ruby
+;;; License:
+
+;; This program is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation; either version 3, or (at your option)
+;; any later version.
+;;
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+;;
+;; You should have received a copy of the GNU General Public License
+;; along with GNU Emacs; see the file COPYING.  If not, write to the
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
+
+;;; Code:
+
 (require 'inf-ruby)
 
-;; Commands
-;; --------
-
+;;;###autoload
 (defun bundle-open (gem-name)
   "Queries for a gem name and opens the location of the gem in dired."
   (interactive (list (read-from-minibuffer "Bundled gem: "
@@ -58,28 +74,29 @@
             (message "Gem not found or Gemfile missing.")
           (dired gem-location)))))
 
+;;;###autoload
 (defun bundle-console ()
   "Run an inferior Ruby process in the context of the current bundle."
   (interactive)
   (run-ruby "bundle console"))
 
+;;;###autoload
 (defun bundle-check ()
   "Run bundle check for the current bundle."
   (interactive)
   (bundle-command "bundle check"))
 
+;;;###autoload
 (defun bundle-install ()
   "Run bundle install for the current bundle."
   (interactive)
   (bundle-command "bundle install"))
 
+;;;###autoload
 (defun bundle-update ()
   "Run bundle update for the current bundle."
   (interactive)
   (bundle-command "bundle update"))
-
-;; Utilities
-;; ---------
 
 (defun bundle-command (cmd)
   "Run cmd in an async buffer."
@@ -97,3 +114,4 @@
       (concat (replace-regexp-in-string "\n" "" bundler-stdout) "/"))))
 
 (provide 'bundler)
+;;; bundler.el ends here.
