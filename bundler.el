@@ -65,8 +65,7 @@
 ;;;###autoload
 (defun bundle-open (gem-name)
   "Queries for a gem name and opens the location of the gem in dired."
-  (interactive (list (read-from-minibuffer "Bundled gem: "
-                                           (first query-replace-defaults))))
+  (interactive (list (completing-read "Bundled gem: " (bundle-list-gems))))
     (if (= (length gem-name) 0)
         (message "No gem name given.")
       (let ((gem-location (bundle-gem-location gem-name)))
@@ -112,6 +111,18 @@
             (string-match "Could not find gem" bundler-stdout))
         ""
       (concat (replace-regexp-in-string "\n" "" bundler-stdout) "/"))))
+
+(defun bundle-list-gems ()
+  (save-excursion
+    (let* ((bundle-out (shell-command-to-string "bundle list"))
+           (bundle-lines (split-string bundle-out "\n")))
+    
+      (defun parse-bundle-list-line (line)
+        (if (string-match "^  \\* \\([^\s]+\\).*$" line)
+            (match-string 1 line)
+          nil))
+
+      (mapcar 'parse-bundle-list-line bundle-lines))))
 
 (provide 'bundler)
 ;;; bundler.el ends here.
