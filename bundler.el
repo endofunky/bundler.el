@@ -6,7 +6,7 @@
 ;; URL: http://github.com/tobiassvn/
 ;; Keywords: bundler ruby
 ;; Created: 31 Dec 2011
-;; Version: 1
+;; Version: 1.1.0
 ;; Package-Requires: ((inf-ruby "2.1"))
 
 ;; This file is NOT part of GNU Emacs.
