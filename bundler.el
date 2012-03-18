@@ -65,8 +65,7 @@
 ;;;###autoload
 (defun bundle-open (gem-name)
   "Queries for a gem name and opens the location of the gem in dired."
-  (interactive (list (read-from-minibuffer "Bundled gem: "
-                                           (first query-replace-defaults))))
+  (interactive (list (completing-read "Bundled gem: " (bundle-list-gems-cached))))
     (if (= (length gem-name) 0)
         (message "No gem name given.")
       (let ((gem-location (bundle-gem-location gem-name)))
@@ -112,6 +111,45 @@
             (string-match "Could not find gem" bundler-stdout))
         ""
       (concat (replace-regexp-in-string "\n" "" bundler-stdout) "/"))))
+
+(defvar bundle-gem-list-cache
+  (make-hash-table)
+  "Holds a hash table of gem lists per directory.")
+
+(defun* bundle-locate-gemfile (&optional (dir default-directory))
+  (let ((has-gemfile (directory-files dir nil "^Gemfile$"))
+        (is-root (equal dir "/")))
+    (cond
+     (has-gemfile dir)
+     (is-root
+      (print (format
+              "No Gemfile found in either %s or any parent directory!"
+              default-directory))
+      nil)
+     ((bundle-locate-gemfile (expand-file-name ".." dir))))))
+
+(defun bundle-list-gems-cached ()
+  (let* ((gemfile-dir (bundle-locate-gemfile))
+         (gem-list (gethash gemfile-dir bundle-gem-list-cache)))
+    (unless gemfile-dir
+      (return nil))
+    (unless gem-list
+      (print (format "Don't have directory %s in cache yet, updating." gemfile-dir))
+      (setq gem-list (bundle-list-gems))
+      (puthash gemfile-dir gem-list bundle-gem-list-cache))
+    gem-list))
+
+(defun bundle-list-gems ()
+  (save-excursion
+    (let* ((bundle-out (shell-command-to-string "bundle list"))
+           (bundle-lines (split-string bundle-out "\n")))
+    
+      (defun parse-bundle-list-line (line)
+        (if (string-match "^  \\* \\([^\s]+\\).*$" line)
+            (match-string 1 line)
+          nil))
+
+      (mapcar 'parse-bundle-list-line bundle-lines))))
 
 (provide 'bundler)
 ;;; bundler.el ends here.
