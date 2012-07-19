@@ -149,7 +149,7 @@
             (match-string 1 line)
           nil))
 
-      (mapcar 'parse-bundle-list-line bundle-lines))))
+      (remq nil (mapcar 'parse-bundle-list-line bundle-lines)))))
 
 (provide 'bundler)
 ;;; bundler.el ends here.
