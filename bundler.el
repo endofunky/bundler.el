@@ -92,10 +92,16 @@
   (bundle-command "bundle install"))
 
 ;;;###autoload
-(defun bundle-update ()
+(defun bundle-update (&optional update-cmd-args)
   "Run bundle update for the current bundle."
-  (interactive)
-  (bundle-command "bundle update"))
+  (interactive "P")
+  (let ((command "bundle update"))
+    ;; For customization of the command with prefix arg.
+    (setq command (if update-cmd-args
+                      (read-string "Run: " (concat command " "))
+                    command))
+
+    (bundle-command command)))
 
 (defun bundle-command (cmd)
   "Run cmd in an async buffer."
@@ -143,7 +149,7 @@
   (save-excursion
     (let* ((bundle-out (shell-command-to-string "bundle list"))
            (bundle-lines (split-string bundle-out "\n")))
-    
+
       (defun parse-bundle-list-line (line)
         (if (string-match "^  \\* \\([^\s]+\\).*$" line)
             (match-string 1 line)
