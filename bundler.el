@@ -116,7 +116,8 @@
     (if (or (string-match "Could not locate Gemfile" bundler-stdout)
             (string-match "Could not find gem" bundler-stdout))
         ""
-      (concat (replace-regexp-in-string "\n" "" bundler-stdout) "/"))))
+      (concat (replace-regexp-in-string
+               "Resolving dependencies...\\|\n" "" bundler-stdout) "/"))))
 
 (defvar bundle-gem-list-cache
   (make-hash-table)
