@@ -137,13 +137,13 @@
 (defun bundle-list-gems-cached ()
   (let* ((gemfile-dir (bundle-locate-gemfile))
          (gem-list (gethash gemfile-dir bundle-gem-list-cache)))
-    (unless gemfile-dir
-      (return nil))
-    (unless gem-list
-      (print (format "Don't have directory %s in cache yet, updating." gemfile-dir))
-      (setq gem-list (bundle-list-gems))
-      (puthash gemfile-dir gem-list bundle-gem-list-cache))
-    gem-list))
+    (if (not gemfile-dir)
+        nil
+      (unless gem-list
+        (print (format "Don't have directory %s in cache yet, updating." gemfile-dir))
+        (setq gem-list (bundle-list-gems))
+        (puthash gemfile-dir gem-list bundle-gem-list-cache))
+      gem-list)))
 
 (defun bundle-list-gems ()
   (save-excursion
