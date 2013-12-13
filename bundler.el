@@ -158,13 +158,22 @@ found."
 
 (defun bundle-list-gems ()
   (save-excursion
-    (let* ((bundle-out (shell-command-to-string "bundle list"))
+    (let* ((cmd "bundle list")
+           (bundle-out (shell-command-to-string cmd))
            (bundle-lines (split-string bundle-out "\n")))
 
       (defun parse-bundle-list-line (line)
-        (if (string-match "^  \\* \\([^\s]+\\).*$" line)
-            (match-string 1 line)
-          nil))
+        (cond
+         ((string-match "^  \\* \\([^\s]+\\).*$" line)
+          (match-string 1 line))
+         ((string-match "Could not \\(find\\|locate\\)" line)
+          (message line) nil)
+         ((string-match "Gems included by the bundle:\\|^ *$" line)
+          nil)
+         (t
+          (message "Warning: couldn't parse line from \"%s\":\n%s"
+                   cmd line)
+          nil)))
 
       (remq nil (mapcar 'parse-bundle-list-line bundle-lines)))))
 
