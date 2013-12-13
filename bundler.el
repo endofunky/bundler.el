@@ -69,9 +69,13 @@
     (if (= (length gem-name) 0)
         (message "No gem name given.")
       (let ((gem-location (bundle-gem-location gem-name)))
-        (if (= (length gem-location) 0)
-            (message "Gem not found or Gemfile missing.")
-          (dired gem-location)))))
+        (cond
+         ((eq gem-location 'no-gemfile)
+          (message "Could not find Gemfile"))
+         (gem-location
+          (dired gem-location))
+         (t
+          (message "Gem '%s' not found" gem-name))))))
 
 ;;;###autoload
 (defun bundle-console ()
@@ -108,16 +112,22 @@
   (async-shell-command cmd "*Bundler*"))
 
 (defun bundle-gem-location (gem-name)
-  "Returns the location of the given gem or an empty string"
-  "if it has not been resolved."
+  "Returns the location of the given gem, or 'no-gemfile if the
+Gemfile could not be found, or nil if the Gem could not be
+found."
   (let ((bundler-stdout
          (shell-command-to-string
           (format "bundle show %s" (shell-quote-argument gem-name)))))
-    (if (or (string-match "Could not locate Gemfile" bundler-stdout)
-            (string-match "Could not find gem" bundler-stdout))
-        ""
+    (cond
+     ((string-match "Could not locate Gemfile" bundler-stdout)
+      'no-gemfile)
+     ((string-match "Could not find " bundler-stdout)
+      nil)
+     (t
       (concat (replace-regexp-in-string
-               "Resolving dependencies...\\|\n" "" bundler-stdout) "/"))))
+               "Resolving dependencies...\\|\n" ""
+               bundler-stdout)
+              "/")))))
 
 (defvar bundle-gem-list-cache
   (make-hash-table)
@@ -148,13 +158,22 @@
 
 (defun bundle-list-gems ()
   (save-excursion
-    (let* ((bundle-out (shell-command-to-string "bundle list"))
+    (let* ((cmd "bundle list")
+           (bundle-out (shell-command-to-string cmd))
            (bundle-lines (split-string bundle-out "\n")))
 
       (defun parse-bundle-list-line (line)
-        (if (string-match "^  \\* \\([^\s]+\\).*$" line)
-            (match-string 1 line)
-          nil))
+        (cond
+         ((string-match "^  \\* \\([^\s]+\\).*$" line)
+          (match-string 1 line))
+         ((string-match "Could not \\(find\\|locate\\)" line)
+          (message line) nil)
+         ((string-match "Gems included by the bundle:\\|^ *$" line)
+          nil)
+         (t
+          (message "Warning: couldn't parse line from \"%s\":\n%s"
+                   cmd line)
+          nil)))
 
       (remq nil (mapcar 'parse-bundle-list-line bundle-lines)))))
 
