@@ -107,9 +107,26 @@
 
     (bundle-command command)))
 
+;;;###autoload
+(defun bundle-exec (command)
+  (interactive "sBundle Exec: ")
+  (run-bundled-command command))
+
 (defun bundle-command (cmd)
   "Run cmd in an async buffer."
   (async-shell-command cmd "*Bundler*"))
+
+(defun run-bundled-command (cmd &rest args)
+  "Run bundle exec for the given command, optionally with args"
+  (interactive)
+  (let (command)
+    (setq command
+          (if args
+              (concat "bundle exec " cmd " "(mapconcat 'identity args " "))
+            (concat "bundle exec " cmd)))
+    (bundle-command command)))
+
+
 
 (defun bundle-gem-location (gem-name)
   "Returns the location of the given gem, or 'no-gemfile if the
