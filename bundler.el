@@ -7,7 +7,7 @@
 ;; Keywords: bundler ruby
 ;; Created: 31 Dec 2011
 ;; Version: 1.1.1
-;; Package-Requires: ((inf-ruby "2.1"))
+;; Package-Requires: ((inf-ruby "2.1") (cl-lib "0.5")
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -59,7 +59,8 @@
 ;; Boston, MA 02110-1301, USA.
 
 ;;; Code:
-(require 'cl)
+
+(require 'cl-lib)
 (require 'inf-ruby)
 
 ;;;###autoload
@@ -150,17 +151,17 @@ found."
   (make-hash-table)
   "Holds a hash table of gem lists per directory.")
 
-(defun* bundle-locate-gemfile (&optional (dir default-directory))
-  (let ((has-gemfile (directory-files dir nil "^Gemfile$"))
-        (is-root (equal dir "/")))
-    (cond
-     (has-gemfile dir)
-     (is-root
-      (print (format
-              "No Gemfile found in either %s or any parent directory!"
-              default-directory))
-      nil)
-     ((bundle-locate-gemfile (expand-file-name ".." dir))))))
+(cl-defun bundle-locate-gemfile (&optional (dir default-directory))
+         (let ((has-gemfile (directory-files dir nil "^Gemfile$"))
+               (is-root (equal dir "/")))
+           (cond
+            (has-gemfile dir)
+            (is-root
+             (print (format
+                     "No Gemfile found in either %s or any parent directory!"
+                     default-directory))
+             nil)
+            ((bundle-locate-gemfile (expand-file-name ".." dir))))))
 
 (defun bundle-list-gems-cached ()
   (let* ((gemfile-dir (bundle-locate-gemfile))
