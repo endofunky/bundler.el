@@ -113,6 +113,27 @@
   (interactive "sBundle Exec: ")
   (run-bundled-command command))
 
+;;;###autoload
+(defun bundle-gemfile (&optional gemfile)
+  "Set BUNDLE_GEMFILE environment variable."
+  (interactive
+   (list
+    (let ((default-p
+            (let ((gemfile-dir (bundle-locate-gemfile)))
+              (if (not gemfile-dir)
+                  "Gemfile"
+                (concat gemfile-dir "Gemfile")))))
+    (read-string (format "Gemfile (%s): " default-p)
+                 default-p nil default-p))))
+  (if gemfile
+      (if (file-readable-p gemfile)
+          (progn
+            (setq bundle-gem-list-cache (make-hash-table))
+            (setenv "BUNDLE_GEMFILE" gemfile)
+            (message "BUNDLE_GEMFILE set to: %s." gemfile))
+        (message "Warning: couldn't read file \"%s\". BUNDLE_GEMFILE unchanged." gemfile))
+    (unsetenv "BUNDLE_GEMFILE")))
+
 (defun bundle-command (cmd)
   "Run cmd in an async buffer."
   (async-shell-command cmd "*Bundler*"))
@@ -126,8 +147,6 @@
               (concat "bundle exec " cmd " "(mapconcat 'identity args " "))
             (concat "bundle exec " cmd)))
     (bundle-command command)))
-
-
 
 (defun bundle-gem-location (gem-name)
   "Returns the location of the given gem, or 'no-gemfile if the
