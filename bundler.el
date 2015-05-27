@@ -132,7 +132,7 @@
             (setenv "BUNDLE_GEMFILE" gemfile)
             (message "BUNDLE_GEMFILE set to: %s." gemfile))
         (message "Warning: couldn't read file \"%s\". BUNDLE_GEMFILE unchanged." gemfile))
-    (unsetenv "BUNDLE_GEMFILE")))
+    (setenv "BUNDLE_GEMFILE")))
 
 (defun bundle-command (cmd)
   "Run cmd in an async buffer."
