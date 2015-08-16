@@ -134,6 +134,24 @@
         (message "Warning: couldn't read file \"%s\". BUNDLE_GEMFILE unchanged." gemfile))
     (setenv "BUNDLE_GEMFILE")))
 
+;;;###autoload
+(defun bundle-outdated ()
+  "List installed gems with newer versions available."
+  (interactive)
+  (bundle-command "bundle outdated"))
+
+;;;###autoload
+(defun bundle-show ()
+  "Shows all gems that are part of the bundle, or the path to a given gem."
+  (interactive)
+  (bundle-command "bundle show"))
+
+;;;###autoload
+(defun bundle-version ()
+  "Prints version information."
+  (interactive)
+  (shell-command "bundle version"))
+
 (defun bundle-command (cmd)
   "Run cmd in an async buffer."
   (async-shell-command cmd "*Bundler*"))
