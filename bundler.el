@@ -172,14 +172,16 @@ Gemfile could not be found, or nil if the Gem could not be
 found."
   (let ((bundler-stdout
          (shell-command-to-string
-          (format "bundle show %s" (shell-quote-argument gem-name)))))
+          (format "bundle show %s" (shell-quote-argument gem-name))))
+        (remote (file-remote-p default-directory)))
     (cond
      ((string-match "Could not locate Gemfile" bundler-stdout)
       'no-gemfile)
      ((string-match "Could not find " bundler-stdout)
       nil)
      (t
-      (concat (replace-regexp-in-string
+      (concat remote
+              (replace-regexp-in-string
                "Resolving dependencies...\\|\n" ""
                bundler-stdout)
               "/")))))
