@@ -234,5 +234,11 @@ found."
 
       (remq nil (mapcar 'parse-bundle-list-line bundle-lines)))))
 
+(defun bundle-list-gem-paths ()
+  (save-excursion
+    (let* ((cmd "bundle list --paths")
+           (bundle-out (shell-command-to-string cmd)))
+      (split-string bundle-out "\n"))))
+
 (provide 'bundler)
 ;;; bundler.el ends here.
