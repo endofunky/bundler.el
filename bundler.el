@@ -7,7 +7,7 @@
 ;; Keywords: bundler ruby
 ;; Created: 31 Dec 2011
 ;; Version: 1.1.1
-;; Package-Requires: ((inf-ruby "2.1") (cl-lib "0.5")
+;; Package-Requires: ((inf-ruby "2.1") (cl-lib "0.5"))
 
 ;; This file is NOT part of GNU Emacs.
 
