@@ -3,7 +3,7 @@
 ;; Copyright (c) 2011 Tobias Svensson <tob@tobiassvensson.co.uk>
 
 ;; Author: Tobias Svensson <tob@tobiassvensson.co.uk>
-;; URL: http://github.com/tobiassvn/
+;; URL: http://github.com/endofunky/bundler.el
 ;; Keywords: bundler ruby
 ;; Created: 31 Dec 2011
 ;; Version: 1.1.1
@@ -34,7 +34,7 @@
 ;;; Install
 
 ;; $ cd ~/.emacs.d/vendor
-;; $ git clone git://github.com/tobiassvn/bundler.el.git
+;; $ git clone git://github.com/endofunky/bundler.el.git
 ;;
 ;; In your emacs config:
 ;;
