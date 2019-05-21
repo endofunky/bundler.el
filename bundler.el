@@ -182,7 +182,7 @@ found."
      (t
       (concat remote
               (replace-regexp-in-string
-               "Resolving dependencies...\\|\n" ""
+               "Resolving dependencies...\\|The dependency .* will be unused by .*$\\|\n" ""
                bundler-stdout)
               "/")))))
 
