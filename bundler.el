@@ -141,10 +141,21 @@
   (bundle-command "bundle outdated"))
 
 ;;;###autoload
+(defun bundle-major-version ()
+  "Returns the bundler major version. If no version is available it returns nil."
+  (let ((output (shell-command-to-string "bundle version")))
+    (when (string-match "bundler version \\([0-9]+\\)" output)
+      (string-to-number (match-string 1 output)))))
+
+;;;###autoload
 (defun bundle-show ()
   "Shows all gems that are part of the bundle, or the path to a given gem."
   (interactive)
-  (bundle-command "bundle show"))
+  (let* ((ver (bundle-major-version))
+         (cmd (if (and ver (< 2 ver)
+                       "bundle show"
+                       "bundle list"))))
+    (bundle-command cmd)))
 
 ;;;###autoload
 (defun bundle-version ()
@@ -170,10 +181,14 @@
   "Returns the location of the given gem, or 'no-gemfile if the
 Gemfile could not be found, or nil if the Gem could not be
 found."
-  (let ((bundler-stdout
-         (shell-command-to-string
-          (format "bundle show %s" (shell-quote-argument gem-name))))
-        (remote (file-remote-p default-directory)))
+  (let* ((ver (bundle-major-version))
+         (cmd (if (and ver (< 2 ver))
+                  "bundle show"
+                "bundle info --path"))
+         (bundler-stdout
+          (shell-command-to-string
+           (format "%s %s" cmd (shell-quote-argument gem-name))))
+         (remote (file-remote-p default-directory)))
     (cond
      ((string-match "Could not locate Gemfile" bundler-stdout)
       'no-gemfile)
